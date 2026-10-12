@@ -1,0 +1,93 @@
+<resources>
+    <string name="app_name">পেগেট ফরোয়ার্ডার</string>
+
+    <!-- General Navigation & Status -->
+    <string name="nav_home">হোম</string>
+    <string name="nav_log">অ্যাক্টিভিটি লগ</string>
+    <string name="nav_settings">সেটিংস</string>
+    <string name="nav_pair">পেয়ারিং</string>
+
+    <string name="status_connected">সংযুক্ত ও সক্রিয়</string>
+    <string name="status_offline">অফলাইন (মেসেজ সংরক্ষিত)</string>
+    <string name="status_needs_attention">মনোযোগ প্রয়োজন</string>
+    <string name="status_unpaired">ডিভাইস সংযুক্ত নয়</string>
+    <string name="status_service_running">ফরোয়ার্ডার সার্ভিস চলছে</string>
+    <string name="status_service_stopped">ফরোয়ার্ডার সার্ভিস বন্ধ</string>
+
+    <!-- Health Checklist -->
+    <string name="health_title">ডিভাইস হেলথ চেকলিস্ট</string>
+    <string name="health_sms_perm">এসএমএস রিসিভ পারমিশন</string>
+    <string name="health_notification_perm">নোটিফিকেশন পারমিশন</string>
+    <string name="health_battery_opt">ব্যাটারি অপ্টিমাইজেশন মুক্ত</string>
+    <string name="health_network">ইন্টারনেট সংযোগ</string>
+    <string name="health_action_grant">অনুমতি দিন</string>
+    <string name="health_action_exempt">মুক্ত করুন</string>
+    <string name="health_action_settings">সেটিংস</string>
+
+    <!-- Home Cards -->
+    <string name="card_last_sms">সর্বশেষ ফরোয়ার্ডকৃত পেমেন্ট</string>
+    <string name="card_last_sms_none">এখনও কোনো ওয়ালেট এসএমএস আসেনি</string>
+    <string name="card_queue_title">স্থানীয় আউটবক্স কিউ</string>
+    <string name="card_queue_pending">%1$d টি অপেক্ষমাণ</string>
+    <string name="card_queue_all_synced">সব মেসেজ সার্ভারে পাঠানো হয়েছে</string>
+    <string name="btn_sync_now">এখনই সিঙ্ক করুন</string>
+    <string name="btn_send_test">টেস্ট এসএমএস পাঠান</string>
+    <string name="btn_simulate_sms">এসএমএস সিমুলেটর</string>
+    <string name="latency_format">ডেলিভারি সময়: %1$d মি.সে.</string>
+    <string name="device_battery_info">ব্যাটারি: %1$d%% (%2$s)</string>
+    <string name="charging_yes">চার্জ হচ্ছে</string>
+    <string name="charging_no">ব্যাটারিতে চলছে</string>
+
+    <!-- Activity Log -->
+    <string name="log_title">ফরোয়ার্ডকৃত মেসেজ তালিকা</string>
+    <string name="log_empty">এখনও কোনো রেকর্ড নেই</string>
+    <string name="log_status_delivered">সফল</string>
+    <string name="log_status_pending">অপেক্ষমাণ</string>
+    <string name="log_status_failed">ব্যর্থ</string>
+    <string name="log_status_ignored">অগ্রাহ্য (টাকা রিসিভ নয়)</string>
+    <string name="log_filter_all">সকল</string>
+    <string name="log_filter_delivered">সফল</string>
+    <string name="log_filter_pending">অপেক্ষমাণ</string>
+    <string name="log_unmask">সম্পূর্ণ তথ্য দেখুন</string>
+    <string name="log_mask">তথ্য লুকান</string>
+
+    <!-- Pairing -->
+    <string name="pair_title">পেগেটের সাথে পেয়ার করুন</string>
+    <string name="pair_subtitle">পেগেট ড্যাশবোর্ড (Devices -> Add Device) থেকে কিউআর কোড স্ক্যান করুন অথবা কোডটি লিখুন।</string>
+    <string name="pair_scan_qr">কিউআর কোড স্ক্যান</string>
+    <string name="pair_manual_entry">কোড লিখে দিন</string>
+    <string name="pair_server_url">পেগেট এপিআই ইউআরএল</string>
+    <string name="pair_code_label">পেয়ারিং কোড (যেমন ABCD-1234)</string>
+    <string name="pair_submit_button">ডিভাইস সংযুক্ত করুন</string>
+    <string name="pair_success">ডিভাইস সফলভাবে সংযুক্ত হয়েছে!</string>
+    <string name="pair_error">পেয়ারিং ব্যর্থ হয়েছে। কোড ও ইন্টারনেট যাচাই করুন।</string>
+
+    <!-- Settings -->
+    <string name="settings_title">ফরোয়ার্ডার সেটিংস</string>
+    <string name="settings_device_info">ডিভাইসের তথ্য</string>
+    <string name="settings_device_id">ডিভাইস আইডি: %1$s</string>
+    <string name="settings_senders_title">অনুমোদিত প্রেরক (Allowlist)</string>
+    <string name="settings_senders_desc">শুধুমাত্র এই প্রেরকদের এসএমএস প্রসেস করা হবে। অন্য কোনো মেসেজ গ্রহণ করা হবে না।</string>
+    <string name="settings_heartbeat_title">হার্টবিট সময়</string>
+    <string name="settings_heartbeat_desc">প্রতি ৫ মিনিট অন্তর ড্যাশবোর্ডে ডিভাইসের সচল অবস্থা পাঠায়।</string>
+    <string name="settings_btn_heartbeat_now">এখনই হার্টবিট পাঠান</string>
+    <string name="settings_language">ভাষা / Language</string>
+    <string name="settings_unpair">ডিভাইস সংযোগ বিচ্ছিন্ন করুন</string>
+    <string name="settings_unpair_confirm">আপনি কি নিশ্চিত? সংযোগ বিচ্ছিন্ন করলে পেমেন্ট ভেরিফিকেশন বন্ধ থাকবে।</string>
+    <string name="settings_oem_title">মোবাইল ব্র্যান্ড অনুযায়ী অটো-স্টার্ট</string>
+    <string name="settings_oem_desc">অ্যাপ ব্যাকগ্রাউন্ডে সক্রিয় রাখতে আপনার ফোনের ব্র্যান্ড অনুযায়ী সেটিংস ঠিক করুন।</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_name">পেগেট ফরোয়ার্ডার সার্ভিস</string>
+    <string name="notif_channel_desc">ব্যাকগ্রাউন্ডে এসএমএস ফরোয়ার্ডার সচল রাখে</string>
+    <string name="notif_title">পেগেট এসএমএস ফরোয়ার্ডার সক্রিয়</string>
+    <string name="notif_body_listening">বিকাশ, নগদ ও রকেট এসএমএসের জন্য প্রস্তুত</string>
+    <string name="notif_body_queue">%1$d টি এসএমএস পাঠানো বাকি</string>
+    <string name="notif_alert_channel">পেগেট সতর্কবার্তা</string>
+    <string name="notif_alert_stuck_queue">এসএমএস কিউ আটকে আছে। ইন্টারনেট চেক করুন।</string>
+    <string name="notif_alert_auth_failed">ডিভাইস টোকেন বাতিল হয়েছে। পুনরায় পেয়ার করুন।</string>
+
+    <!-- Privacy -->
+    <string name="privacy_title">গোপনীয়তা ও নিরাপত্তা</string>
+    <string name="privacy_body">পেগেট ফরোয়ার্ডার শুধুমাত্র অনুমোদিত পেমেন্ট এসএমএস (বিকাশ, নগদ, রকেট) পাঠায়। কোনো ব্যক্তিগত এসএমএস, ওটিপি বা ১১ ডিজিটের ফোন নম্বরের মেসেজ কখনো পড়া বা সার্ভারে পাঠানো হয় না।</string>
+</resources>

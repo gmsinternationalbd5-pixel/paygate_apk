@@ -1,0 +1,49 @@
+# Product Requirements Document (PRD)
+## PayGate SMS Forwarder — Android Companion App
+**Version:** 1.0 · Production Grade  
+**Date:** October 12, 2026  
+**Companion System:** PayGate Merchant SaaS (Next.js + Supabase)
+
+---
+
+## 1. Executive Summary
+PayGate enables Bangladeshi online merchants to accept mobile financial service payments (bKash, Nagad, and Rocket) without complex provider APIs or merchant account delays. The server confirms incoming customer payments by matching customer-submitted Transaction IDs (TrxID) against genuine "money received" SMS messages arriving on the merchant's dedicated Android phone.
+
+The **PayGate SMS Forwarder** is the Android companion application running on that merchant phone. It continuously watches for incoming financial wallet SMS, filters them against an on-device allowlist and regex pattern, persists them locally to a durable Room outbox, and delivers them reliably over HTTPS to the PayGate server webhook (`/v1/sms/webhook`).
+
+Reliability, security, and battery longevity are the foundational product pillars.
+
+---
+
+## 2. Goals & Non-Goals
+
+### Goals
+- **Zero Message Loss:** Guarantee that every qualifying wallet payment SMS is durably stored before any network request and delivered to the PayGate server within 5 seconds on a healthy connection.
+- **Aggressive OEM Survival:** Maintain background operation across reboots, app updates, and aggressive battery management found on Xiaomi (MIUI/HyperOS), Samsung (OneUI), Oppo/Realme (ColorOS), Vivo (FuntouchOS), Tecno, and Infinix devices.
+- **Strict Forgery Resistance:** Enforce on-device sender allowlisting (bKash, NAGAD, 16216) and reject standard 11-digit phone numbers (`017xxxxxxxx`) to eliminate spoofing attacks.
+- **Glanceable Device Health:** Provide merchants and admins with real-time fleet health (connection state, battery %, queue depth, last heartbeat, permission status).
+- **Fast Onboarding:** Complete pairing via QR code in under 2 minutes with zero typing of secrets.
+
+### Non-Goals (v1)
+- Reading, storing, or uploading personal SMS, bank OTPs, or non-wallet messages.
+- Sending SMS, replying to customers, or initiating wallet transactions.
+- iOS support (iOS prevents background SMS broadcast interception).
+- On-device transaction authority: The server remains the ultimate source of truth for transaction matching and settlement.
+
+---
+
+## 3. Functional Requirements (FR) Summary
+- **FR-1:** Capture incoming SMS via manifest-registered `SMS_RECEIVED` receiver, reassembling multipart PDUs.
+- **FR-2:** Persist candidate messages to offline Room database (`queued_sms`) before any network call.
+- **FR-3:** Filter for genuine wallet payment indicators ("received" or "Cash In") and valid TrxID tokens. Discard personal SMS and OTPs immediately.
+- **FR-4:** Sender allowlist enforcement (`bKash`, `NAGAD`, `16216`). Reject standard 11-digit numbers unconditionally.
+- **FR-5:** Deliver to `POST /v1/sms/webhook` with bearer token over HTTPS with exponential backoff retry.
+- **FR-6:** Idempotent delivery using SHA-256 client message ID (`client_msg_id`).
+- **FR-7:** Pair via QR code or manual entry (`POST /v1/devices/pair`), token encrypted via Android KeyStore.
+- **FR-8:** Foreground service (`dataSync`) with persistent notification + `RECEIVE_BOOT_COMPLETED` restart.
+- **FR-9:** Guided onboarding with live health checklist (SMS, Notifications, Battery exemption, OEM auto-start).
+- **FR-10:** Home dashboard displaying connection status, last forwarded payment, queue depth, and test simulator.
+- **FR-11:** Heartbeat every 5 minutes reporting battery %, charging, network type, queue depth, and permissions.
+- **FR-12:** Activity log of up to 200 items with delivery status, masked TrxID, and reveal toggle.
+- **FR-15:** Dual-SIM slot identification recorded in `QueuedSms` and forwarded in webhook payload.
+- **FR-18:** Full English and Bengali (বাংলা) localization with instant language switching.
