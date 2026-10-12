@@ -1,12 +1,12 @@
-package com.example.service
+package com.paygate.smsfwd.service
 
 import android.content.Context
-import com.example.data.local.dao.QueuedSmsDao
-import com.example.data.local.entity.QueuedSms
-import com.example.data.prefs.PreferenceManager
-import com.example.data.remote.ApiClient
-import com.example.data.remote.model.WebhookRequest
-import com.example.data.security.KeystoreSecretManager
+import com.paygate.smsfwd.data.local.dao.QueuedSmsDao
+import com.paygate.smsfwd.data.local.entity.QueuedSms
+import com.paygate.smsfwd.data.prefs.PreferenceManager
+import com.paygate.smsfwd.data.remote.ApiClient
+import com.paygate.smsfwd.data.remote.model.WebhookRequest
+import com.paygate.smsfwd.data.security.KeystoreSecretManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

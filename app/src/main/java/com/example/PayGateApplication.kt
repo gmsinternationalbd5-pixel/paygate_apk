@@ -1,10 +1,10 @@
-package com.example
+package com.paygate.smsfwd
 
 import android.app.Application
-import com.example.data.local.db.AppDatabase
-import com.example.data.prefs.PreferenceManager
-import com.example.data.security.KeystoreSecretManager
-import com.example.service.PayGateForwarderService
+import com.paygate.smsfwd.data.local.db.AppDatabase
+import com.paygate.smsfwd.data.prefs.PreferenceManager
+import com.paygate.smsfwd.data.security.KeystoreSecretManager
+import com.paygate.smsfwd.service.PayGateForwarderService
 
 class PayGateApplication : Application() {
 

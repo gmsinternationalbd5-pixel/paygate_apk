@@ -1,11 +1,11 @@
-package com.example.data.remote
+package com.paygate.smsfwd.data.remote
 
-import com.example.data.remote.model.HeartbeatRequest
-import com.example.data.remote.model.HeartbeatResponse
-import com.example.data.remote.model.PairRequest
-import com.example.data.remote.model.PairResponse
-import com.example.data.remote.model.WebhookRequest
-import com.example.data.remote.model.WebhookResponse
+import com.paygate.smsfwd.data.remote.model.HeartbeatRequest
+import com.paygate.smsfwd.data.remote.model.HeartbeatResponse
+import com.paygate.smsfwd.data.remote.model.PairRequest
+import com.paygate.smsfwd.data.remote.model.PairResponse
+import com.paygate.smsfwd.data.remote.model.WebhookRequest
+import com.paygate.smsfwd.data.remote.model.WebhookResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header

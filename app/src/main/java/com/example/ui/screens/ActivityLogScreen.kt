@@ -1,4 +1,4 @@
-package com.example.ui.screens
+package com.paygate.smsfwd.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -56,18 +56,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.data.local.entity.QueuedSms
-import com.example.ui.components.ChipStatus
-import com.example.ui.components.PinLockDialog
-import com.example.ui.components.ReferenceChip
-import com.example.ui.components.StatusChip
-import com.example.ui.theme.GateDangerLight
-import com.example.ui.theme.GateSuccessLight
-import com.example.ui.theme.GateWarningLight
-import com.example.ui.theme.ProviderBkash
-import com.example.ui.theme.ProviderNagad
-import com.example.ui.theme.ProviderRocket
-import com.example.ui.viewmodel.MainViewModel
+import com.paygate.smsfwd.data.local.entity.QueuedSms
+import com.paygate.smsfwd.ui.components.ChipStatus
+import com.paygate.smsfwd.ui.components.PinLockDialog
+import com.paygate.smsfwd.ui.components.ReferenceChip
+import com.paygate.smsfwd.ui.components.StatusChip
+import com.paygate.smsfwd.ui.theme.GateDangerLight
+import com.paygate.smsfwd.ui.theme.GateSuccessLight
+import com.paygate.smsfwd.ui.theme.GateWarningLight
+import com.paygate.smsfwd.ui.theme.ProviderBkash
+import com.paygate.smsfwd.ui.theme.ProviderNagad
+import com.paygate.smsfwd.ui.theme.ProviderRocket
+import com.paygate.smsfwd.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date

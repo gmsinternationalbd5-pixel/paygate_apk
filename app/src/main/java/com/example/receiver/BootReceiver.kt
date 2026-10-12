@@ -1,10 +1,10 @@
-package com.example.receiver
+package com.paygate.smsfwd.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.data.prefs.PreferenceManager
-import com.example.service.PayGateForwarderService
+import com.paygate.smsfwd.data.prefs.PreferenceManager
+import com.paygate.smsfwd.service.PayGateForwarderService
 
 class BootReceiver : BroadcastReceiver() {
 

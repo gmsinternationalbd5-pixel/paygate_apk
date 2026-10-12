@@ -1,11 +1,11 @@
-package com.example.data.local.db
+package com.paygate.smsfwd.data.local.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.data.local.dao.QueuedSmsDao
-import com.example.data.local.entity.QueuedSms
+import com.paygate.smsfwd.data.local.dao.QueuedSmsDao
+import com.paygate.smsfwd.data.local.entity.QueuedSms
 
 @Database(
     entities = [QueuedSms::class],

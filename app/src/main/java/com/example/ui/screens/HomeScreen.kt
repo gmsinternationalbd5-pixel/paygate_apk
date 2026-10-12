@@ -1,4 +1,4 @@
-package com.example.ui.screens
+package com.paygate.smsfwd.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -72,23 +72,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.R
-import com.example.data.local.entity.QueuedSms
-import com.example.ui.components.ChipStatus
-import com.example.ui.components.GateButton
-import com.example.ui.components.HealthRow
-import com.example.ui.components.MaskedValue
-import com.example.ui.components.ReferenceChip
-import com.example.ui.components.StatCard
-import com.example.ui.components.StatusChip
-import com.example.ui.theme.GateDangerLight
-import com.example.ui.theme.GateSuccessLight
-import com.example.ui.theme.GateWarningLight
-import com.example.ui.theme.ProviderBkash
-import com.example.ui.theme.ProviderNagad
-import com.example.ui.theme.ProviderRocket
-import com.example.ui.viewmodel.HealthStatus
-import com.example.ui.viewmodel.MainViewModel
+import com.paygate.smsfwd.R
+import com.paygate.smsfwd.data.local.entity.QueuedSms
+import com.paygate.smsfwd.ui.components.ChipStatus
+import com.paygate.smsfwd.ui.components.GateButton
+import com.paygate.smsfwd.ui.components.HealthRow
+import com.paygate.smsfwd.ui.components.MaskedValue
+import com.paygate.smsfwd.ui.components.ReferenceChip
+import com.paygate.smsfwd.ui.components.StatCard
+import com.paygate.smsfwd.ui.components.StatusChip
+import com.paygate.smsfwd.ui.theme.GateDangerLight
+import com.paygate.smsfwd.ui.theme.GateSuccessLight
+import com.paygate.smsfwd.ui.theme.GateWarningLight
+import com.paygate.smsfwd.ui.theme.ProviderBkash
+import com.paygate.smsfwd.ui.theme.ProviderNagad
+import com.paygate.smsfwd.ui.theme.ProviderRocket
+import com.paygate.smsfwd.ui.viewmodel.HealthStatus
+import com.paygate.smsfwd.ui.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -371,7 +371,7 @@ fun HomeScreen(
 
 @Composable
 fun SimWalletsStatusRow(
-    wallets: List<com.example.data.remote.model.WalletSlotInfo>,
+    wallets: List<com.paygate.smsfwd.data.remote.model.WalletSlotInfo>,
     isPaired: Boolean,
     onConfigureClick: () -> Unit
 ) {

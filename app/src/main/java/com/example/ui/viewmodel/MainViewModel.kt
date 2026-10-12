@@ -1,4 +1,4 @@
-package com.example.ui.viewmodel
+package com.paygate.smsfwd.ui.viewmodel
 
 import android.Manifest
 import android.app.Application
@@ -9,14 +9,14 @@ import android.os.PowerManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.PayGateApplication
-import com.example.data.local.entity.QueuedSms
-import com.example.data.prefs.PreferenceManager
-import com.example.data.remote.ApiClient
-import com.example.data.remote.model.PairRequest
-import com.example.data.remote.model.WalletSlotInfo
-import com.example.domain.filter.SmsFilter
-import com.example.service.PayGateForwarderService
+import com.paygate.smsfwd.PayGateApplication
+import com.paygate.smsfwd.data.local.entity.QueuedSms
+import com.paygate.smsfwd.data.prefs.PreferenceManager
+import com.paygate.smsfwd.data.remote.ApiClient
+import com.paygate.smsfwd.data.remote.model.PairRequest
+import com.paygate.smsfwd.data.remote.model.WalletSlotInfo
+import com.paygate.smsfwd.domain.filter.SmsFilter
+import com.paygate.smsfwd.service.PayGateForwarderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -24,5 +24,5 @@
 -keepclassmembers class * {
     @com.squareup.moshi.Json <fields>;
 }
--keep class com.example.data.remote.model.** { *; }
--keep class com.example.data.local.entity.** { *; }
+-keep class com.paygate.smsfwd.data.remote.model.** { *; }
+-keep class com.paygate.smsfwd.data.local.entity.** { *; }

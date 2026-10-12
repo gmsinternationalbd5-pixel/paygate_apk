@@ -1,4 +1,4 @@
-package com.example.service
+package com.paygate.smsfwd.service
 
 import android.Manifest
 import android.app.Notification
@@ -20,14 +20,14 @@ import android.os.PowerManager
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.example.MainActivity
-import com.example.R
-import com.example.data.local.db.AppDatabase
-import com.example.data.prefs.PreferenceManager
-import com.example.data.remote.ApiClient
-import com.example.data.remote.model.HeartbeatRequest
-import com.example.data.remote.model.SimSlotState
-import com.example.data.security.KeystoreSecretManager
+import com.paygate.smsfwd.MainActivity
+import com.paygate.smsfwd.R
+import com.paygate.smsfwd.data.local.db.AppDatabase
+import com.paygate.smsfwd.data.prefs.PreferenceManager
+import com.paygate.smsfwd.data.remote.ApiClient
+import com.paygate.smsfwd.data.remote.model.HeartbeatRequest
+import com.paygate.smsfwd.data.remote.model.SimSlotState
+import com.paygate.smsfwd.data.security.KeystoreSecretManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -397,10 +397,10 @@ class PayGateForwarderService : Service() {
         const val CHANNEL_SERVICE = "paygate_forwarder_channel"
         const val CHANNEL_ALERTS = "paygate_alerts_channel"
 
-        const val ACTION_START = "com.example.service.ACTION_START"
-        const val ACTION_STOP = "com.example.service.ACTION_STOP"
-        const val ACTION_TRIGGER_DRAIN = "com.example.service.ACTION_TRIGGER_DRAIN"
-        const val ACTION_HEARTBEAT = "com.example.service.ACTION_HEARTBEAT"
+        const val ACTION_START = "com.paygate.smsfwd.service.ACTION_START"
+        const val ACTION_STOP = "com.paygate.smsfwd.service.ACTION_STOP"
+        const val ACTION_TRIGGER_DRAIN = "com.paygate.smsfwd.service.ACTION_TRIGGER_DRAIN"
+        const val ACTION_HEARTBEAT = "com.paygate.smsfwd.service.ACTION_HEARTBEAT"
 
         fun start(context: Context) {
             val intent = Intent(context, PayGateForwarderService::class.java).apply {

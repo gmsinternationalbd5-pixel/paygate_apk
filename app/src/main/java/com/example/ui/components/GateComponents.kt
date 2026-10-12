@@ -1,4 +1,4 @@
-package com.example.ui.components
+package com.paygate.smsfwd.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -49,10 +49,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GateBorderLight
-import com.example.ui.theme.GateDangerLight
-import com.example.ui.theme.GateSuccessLight
-import com.example.ui.theme.GateWarningLight
+import com.paygate.smsfwd.ui.theme.GateBorderLight
+import com.paygate.smsfwd.ui.theme.GateDangerLight
+import com.paygate.smsfwd.ui.theme.GateSuccessLight
+import com.paygate.smsfwd.ui.theme.GateWarningLight
 
 @Composable
 fun GateButton(

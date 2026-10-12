@@ -1,4 +1,4 @@
-package com.example.receiver
+package com.paygate.smsfwd.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,11 +6,11 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Telephony
 import android.telephony.SubscriptionManager
-import com.example.data.local.db.AppDatabase
-import com.example.data.local.entity.QueuedSms
-import com.example.data.prefs.PreferenceManager
-import com.example.domain.filter.SmsFilter
-import com.example.service.PayGateForwarderService
+import com.paygate.smsfwd.data.local.db.AppDatabase
+import com.paygate.smsfwd.data.local.entity.QueuedSms
+import com.paygate.smsfwd.data.prefs.PreferenceManager
+import com.paygate.smsfwd.domain.filter.SmsFilter
+import com.paygate.smsfwd.service.PayGateForwarderService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

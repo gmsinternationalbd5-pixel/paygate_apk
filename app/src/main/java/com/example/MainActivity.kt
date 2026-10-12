@@ -1,4 +1,4 @@
-package com.example
+package com.paygate.smsfwd
 
 import android.Manifest
 import android.content.res.Configuration
@@ -58,15 +58,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.ui.screens.ActivityLogScreen
-import com.example.ui.screens.HomeScreen
-import com.example.ui.screens.PairingScreen
-import com.example.ui.screens.SettingsScreen
-import com.example.ui.theme.PayGateTheme
-import com.example.ui.theme.StatusPending
-import com.example.ui.theme.StatusSuccess
-import com.example.ui.theme.StatusWarning
-import com.example.ui.viewmodel.MainViewModel
+import com.paygate.smsfwd.ui.screens.ActivityLogScreen
+import com.paygate.smsfwd.ui.screens.HomeScreen
+import com.paygate.smsfwd.ui.screens.PairingScreen
+import com.paygate.smsfwd.ui.screens.SettingsScreen
+import com.paygate.smsfwd.ui.theme.PayGateTheme
+import com.paygate.smsfwd.ui.theme.StatusPending
+import com.paygate.smsfwd.ui.theme.StatusSuccess
+import com.paygate.smsfwd.ui.theme.StatusWarning
+import com.paygate.smsfwd.ui.viewmodel.MainViewModel
 import java.util.Locale
 
 enum class ScreenTab {

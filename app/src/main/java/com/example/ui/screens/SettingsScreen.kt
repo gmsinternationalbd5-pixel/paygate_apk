@@ -1,4 +1,4 @@
-package com.example.ui.screens
+package com.paygate.smsfwd.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -55,9 +55,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.R
-import com.example.ui.theme.StatusError
-import com.example.ui.viewmodel.MainViewModel
+import com.paygate.smsfwd.R
+import com.paygate.smsfwd.ui.theme.StatusError
+import com.paygate.smsfwd.ui.viewmodel.MainViewModel
 
 @Composable
 fun SettingsScreen(

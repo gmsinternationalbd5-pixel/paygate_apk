@@ -1,4 +1,4 @@
-package com.example.domain.model
+package com.paygate.smsfwd.domain.model
 
 data class SmsMetadata(
     val provider: String,

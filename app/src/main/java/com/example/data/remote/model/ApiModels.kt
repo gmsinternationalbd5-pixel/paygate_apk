@@ -1,4 +1,4 @@
-package com.example.data.remote.model
+package com.paygate.smsfwd.data.remote.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

@@ -1,4 +1,4 @@
-package com.example.data.local.entity
+package com.paygate.smsfwd.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

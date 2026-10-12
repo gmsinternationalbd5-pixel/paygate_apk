@@ -1,4 +1,4 @@
-package com.example.data.remote
+package com.paygate.smsfwd.data.remote
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

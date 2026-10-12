@@ -1,4 +1,4 @@
-package com.example.domain.filter
+package com.paygate.smsfwd.domain.filter
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

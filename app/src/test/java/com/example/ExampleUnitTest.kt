@@ -1,4 +1,4 @@
-package com.example
+package com.paygate.smsfwd
 
 import org.junit.Assert.*
 import org.junit.Test

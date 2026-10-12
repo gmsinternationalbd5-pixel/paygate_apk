@@ -1,6 +1,6 @@
-package com.example.domain.filter
+package com.paygate.smsfwd.domain.filter
 
-import com.example.domain.model.SmsMetadata
+import com.paygate.smsfwd.domain.model.SmsMetadata
 import java.security.MessageDigest
 import java.util.Locale
 

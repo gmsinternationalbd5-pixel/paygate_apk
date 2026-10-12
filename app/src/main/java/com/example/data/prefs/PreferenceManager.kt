@@ -1,9 +1,9 @@
-package com.example.data.prefs
+package com.paygate.smsfwd.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.data.remote.ApiClient
-import com.example.data.remote.model.WalletSlotInfo
+import com.paygate.smsfwd.data.remote.ApiClient
+import com.paygate.smsfwd.data.remote.model.WalletSlotInfo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

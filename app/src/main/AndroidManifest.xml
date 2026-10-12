@@ -21,10 +21,6 @@
     <!-- Dual SIM Slot Detection -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <!-- Camera for QR Pairing Scan (Optional) -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-
     <application
         android:name=".PayGateApplication"
         android:allowBackup="false"
