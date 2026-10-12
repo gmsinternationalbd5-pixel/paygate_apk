@@ -1,49 +1,266 @@
-# Product Requirements Document (PRD)
-## PayGate SMS Forwarder — Android Companion App
-**Version:** 1.0 · Production Grade  
-**Date:** October 12, 2026  
-**Companion System:** PayGate Merchant SaaS (Next.js + Supabase)
+# PayGate SMS Forwarder (Android) — Product Requirements Document v3.0
+**Companion to PayGate Platform PRD v3.0**  
+**Technology:** Kotlin + Jetpack Compose (Material 3 with Gate UI tokens)  
+**Date:** 13 October 2026  
+**Status:** Approved / Production Specification  
 
 ---
 
-## 1. Executive Summary
-PayGate enables Bangladeshi online merchants to accept mobile financial service payments (bKash, Nagad, and Rocket) without complex provider APIs or merchant account delays. The server confirms incoming customer payments by matching customer-submitted Transaction IDs (TrxID) against genuine "money received" SMS messages arriving on the merchant's dedicated Android phone.
+## 1. Role in the System
 
-The **PayGate SMS Forwarder** is the Android companion application running on that merchant phone. It continuously watches for incoming financial wallet SMS, filters them against an on-device allowlist and regex pattern, persists them locally to a durable Room outbox, and delivers them reliably over HTTPS to the PayGate server webhook (`/v1/sms/webhook`).
+The **PayGate SMS Forwarder** runs on dedicated PayGate-owned Android devices that hold PayGate's mobile financial service (MFS) wallet SIMs (bKash, Nagad, and Rocket).
 
-Reliability, security, and battery longevity are the foundational product pillars.
+- **Core Mission:** Captures received-money SMS notifications, keeps only genuine wallet messages, saves each candidate message to an encrypted outbox before any network transmission, and delivers it with exponential backoff and idempotency to `/v1/sms/webhook`.
+- **Division of Authority:** The server parses, matches, and settles transactions; the app **never** decides whether a payment is valid or customer-confirmed.
+- **Audience:** Operators and PayGate support. Merchants never install or configure this application.
 
----
+### Core Pillars
+1. **Never lose a message:** Durable local persistence before network calls; delivery retry across network drops.
+2. **Survive OEM battery management:** Persistent foreground service with watchdog and device-specific auto-start guides.
+3. **Expose nothing it does not need:** Strict sender allowlist, phone-number sender rejection, zero PII logging, and KeyStore hardware encryption.
 
-## 2. Goals & Non-Goals
+### User Personas
+| Persona | Primary Needs |
+|---|---|
+| **Fleet Operator** | Pair a phone in under 2 minutes via QR code, glanceable green/red status per SIM, one-tap "Fix" on failing health rows. |
+| **Support Agent** | Force queue sync ("Sync now"), trigger test SMS, export sanitized diagnostics without PII, inspect activity log with masked TrxID. |
+| **PayGate Admin** | Real-time fleet telemetry via heartbeat, remote token revocation, remote queue flush, forced app updates, maintenance mode. |
 
-### Goals
-- **Zero Message Loss:** Guarantee that every qualifying wallet payment SMS is durably stored before any network request and delivered to the PayGate server within 5 seconds on a healthy connection.
-- **Aggressive OEM Survival:** Maintain background operation across reboots, app updates, and aggressive battery management found on Xiaomi (MIUI/HyperOS), Samsung (OneUI), Oppo/Realme (ColorOS), Vivo (FuntouchOS), Tecno, and Infinix devices.
-- **Strict Forgery Resistance:** Enforce on-device sender allowlisting (bKash, NAGAD, 16216) and reject standard 11-digit phone numbers (`017xxxxxxxx`) to eliminate spoofing attacks.
-- **Glanceable Device Health:** Provide merchants and admins with real-time fleet health (connection state, battery %, queue depth, last heartbeat, permission status).
-- **Fast Onboarding:** Complete pairing via QR code in under 2 minutes with zero typing of secrets.
+### Product Goals
+- **Zero Message Loss:** Every qualifying wallet SMS stored in local encrypted database before first network call.
+- **P95 Latency:** Delivery under 5 seconds on a healthy network connection.
+- **Survivability:** Resilient against device reboots, app updates, process termination, Doze mode, and aggressive OEM background policies.
+- **Bilingual Interface:** First-class English and Bengali (বাংলা) support with instant in-app switching.
 
-### Non-Goals (v1)
+### Non-Goals
+- Sending SMS messages, replying to customers, or initiating wallet transfers.
 - Reading, storing, or uploading personal SMS, bank OTPs, or non-wallet messages.
-- Sending SMS, replying to customers, or initiating wallet transactions.
-- iOS support (iOS prevents background SMS broadcast interception).
-- On-device transaction authority: The server remains the ultimate source of truth for transaction matching and settlement.
+- iOS support (Apple iOS restricts background SMS broadcast interception).
+- On-device payment authorization or settlement.
+- Google Play Store distribution (distributed via MDM / private enterprise APK).
 
 ---
 
-## 3. Functional Requirements (FR) Summary
-- **FR-1:** Capture incoming SMS via manifest-registered `SMS_RECEIVED` receiver, reassembling multipart PDUs.
-- **FR-2:** Persist candidate messages to offline Room database (`queued_sms`) before any network call.
-- **FR-3:** Filter for genuine wallet payment indicators ("received" or "Cash In") and valid TrxID tokens. Discard personal SMS and OTPs immediately.
-- **FR-4:** Sender allowlist enforcement (`bKash`, `NAGAD`, `16216`). Reject standard 11-digit numbers unconditionally.
-- **FR-5:** Deliver to `POST /v1/sms/webhook` with bearer token over HTTPS with exponential backoff retry.
-- **FR-6:** Idempotent delivery using SHA-256 client message ID (`client_msg_id`).
-- **FR-7:** Pair via QR code or manual entry (`POST /v1/devices/pair`), token encrypted via Android KeyStore.
-- **FR-8:** Foreground service (`dataSync`) with persistent notification + `RECEIVE_BOOT_COMPLETED` restart.
-- **FR-9:** Guided onboarding with live health checklist (SMS, Notifications, Battery exemption, OEM auto-start).
-- **FR-10:** Home dashboard displaying connection status, last forwarded payment, queue depth, and test simulator.
-- **FR-11:** Heartbeat every 5 minutes reporting battery %, charging, network type, queue depth, and permissions.
-- **FR-12:** Activity log of up to 200 items with delivery status, masked TrxID, and reveal toggle.
-- **FR-15:** Dual-SIM slot identification recorded in `QueuedSms` and forwarded in webhook payload.
-- **FR-18:** Full English and Bengali (বাংলা) localization with instant language switching.
+## 2. Feature Flow
+
+```text
+[ Incoming SMS Broadcast (Telephony.Sms.Intents) ]
+                      │
+                      ▼
+             [ SmsReceiver.goAsync() ]
+             (Multipart PDU Reassembly)
+                      │
+                      ▼
+               [ SmsFilter ]
+     ┌────────────────┴────────────────┐
+     ▼                                 ▼
+[ Non-Wallet / OTP / Spoofed ]    [ Valid Wallet SMS ]
+- 10+ digit sender numbers        - Allowlisted sender (bKash, NAGAD, 16216)
+- Contains OTP/PIN/sent words     - Incoming money keyword (received, Cash In)
+- Dropped: No storage, no log     - Tk/৳ amount + TrxID token
+                                  - Extracted ref_hint (optional)
+                                       │
+                                       ▼
+                       [ AppDatabase (Room + Encrypted) ]
+                       Insert into QueuedSms (Status: PENDING)
+                       SHA-256 client_msg_id generated
+                                       │
+                                       ▼
+                       [ PayGateForwarderService (dataSync) ]
+                                       │
+                                       ▼
+                            [ QueueSyncManager ]
+                       POST /v1/sms/webhook (Oldest First)
+                                       │
+               ┌───────────────────────┼───────────────────────┐
+               ▼                       ▼                       ▼
+          [ HTTP 200 ]            [ HTTP 401/403 ]        [ 429 / 5xx / Offline ]
+          - Mark DELIVERED        - Pause delivery        - Exponential backoff
+          - Record latency        - Keep queue intact     - Jittered retry (2s to 15m)
+          - Prune after 7 days    - Show re-pair screen   - Drain immediately on reconnect
+                                  - Local urgent alert
+```
+
+---
+
+## 3. Requirements (FR Matrix)
+
+| ID | Priority | Requirement | Implementation / Verification |
+|---|---|---|---|
+| **FR-1** | **P0** | Manifest `SMS_RECEIVED` receiver; reassemble multipart PDUs; hand off with `goAsync()` within execution budget. | `com.example.receiver.SmsReceiver` with `Telephony.Sms.Intents.getMessagesFromIntent` |
+| **FR-2** | **P0** | Insert into Room outbox in one transaction before any network call; failed insert raises a local alert. | `AppDatabase`, `QueuedSmsDao.insertSms()` transaction |
+| **FR-3** | **P0** | Discard non-qualifying SMS immediately: no storage, no logging, zero PII leakage. | `SmsFilter.isWalletReceivedMessage()` |
+| **FR-4** | **P0** | Sender allowlist (`bKash`, `NAGAD`, `16216` by default), case-insensitive and trimmed; server dynamic updates (max 10 entries); always reject phone-number senders (10+ digits, `+880`, `880`, `01`). | `SmsFilter.isAllowedSender()` & `isPhoneNumberSender()` |
+| **FR-5** | **P0** | Qualify only if SMS has an incoming-money word (`received`, `Cash In`, `credited`, Bengali equivalents), an amount (`Tk` or `৳`), and a transaction token (`TrxID`, `TxnId`, `Txn ID`, `TransactionID` + 4-16 alphanumerics). Exclude OTP, PIN, sent, payment to, cash out, recharge. A reference is never required. | `SmsFilter.isWalletReceivedMessage()`, `DISQUALIFY_KEYWORDS` |
+| **FR-6** | **P0** | Extract `ref_hint`: label Ref, Reference, Ref No (any case, optional `:`, `-`, `#`) or Bengali label, then a 6 to 20 character alphanumeric token. Normalise to uppercase without spaces or hyphens; null if absent. Server is authority. | `SmsFilter.extractRefHint()` |
+| **FR-7** | **P0** | POST to `/v1/sms/webhook` over TLS 1.2+ with bearer token; oldest first, one request in flight, 10s timeout. | `QueueSyncManager.drainQueue()`, `ApiClient` |
+| **FR-8** | **P0** | Exponential backoff with jitter: base 2s, cap 15 min; reset on success or network change. | `QueueSyncManager.calculateBackoffDelay()` |
+| **FR-9** | **P0** | `client_msg_id = SHA-256(sender \| body \| received_at \| sim_slot)`; server deduplicates. | `SmsFilter.generateClientMsgId()` |
+| **FR-10**| **P0** | Retain until resolved: mark delivered only after 2xx; rows older than 24h become stale, stay visible and keep retrying. | `QueuedSms.status = "STALE"` / `PENDING` |
+| **FR-11**| **P0** | Drain the queue immediately on connectivity change. | `ConnectivityObserver`, `NetworkCallback` |
+| **FR-12**| **P0** | Pair by QR (manual code fallback) issued from Admin console; single-use code expires in 10 min; response lists wallet per SIM slot; distinct errors for expired, used, invalid, offline. | `PairingScreen.kt`, `PairingRequest`, `PairingResponse` |
+| **FR-13**| **P0** | Token in Android KeyStore (AES-256-GCM, non-exportable); dynamic rotation via heartbeat response (`rotate_token`). | `KeystoreSecretManager.kt` |
+| **FR-14**| **P0** | On 401 or 403: pause delivery, keep queue, show blocking re-pair screen, trigger local alert notification. | `QueueSyncManager`, `PayGateForwarderService` |
+| **FR-15**| **P0** | Block forwarding for a SIM slot with no registered wallet and alert the operator. | `PayGateForwarderService`, `SmsFilter` |
+| **FR-16**| **P1** | Unpair with app PIN, or remotely from Admin console. | `SettingsScreen.kt`, remote command `REVOKE_TOKEN` |
+| **FR-17**| **P0** | Foreground service (`dataSync`) plus `BootReceiver` for `BOOT_COMPLETED`, `LOCKED_BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`. | `PayGateForwarderService`, `BootReceiver` |
+| **FR-18**| **P0** | Setup checklist with live status and Fix button per row: SMS, notifications, battery exemption, OEM auto-start, background data, lock in recents, wallet mapping; rechecked on resume and heartbeat. | `HomeScreen.kt`, `HealthChecklistCard` |
+| **FR-19**| **P0** | Mandatory app PIN (4-digit operator PIN) for settings, unpair, and reveal actions. | `AppPreferences.appPin`, `PinAuthDialog` |
+| **FR-20**| **P0** | Supports Android Enterprise device-owner (kiosk) mode: app locked, installs blocked, USB debugging off. | `AppPreferences.isKioskModeEnabled` |
+| **FR-21**| **P0** | Heartbeat every 120s (server-configurable) plus 15 min WorkManager safety net; server marks device offline after 3 min. | `PayGateForwarderService.startPeriodicHeartbeat()` |
+| **FR-22**| **P1** | Home: status per SIM and wallet (bKash, Nagad, Rocket), queue depth, stale count, last payment (masked), Sync now, Send test. | `HomeScreen.kt` |
+| **FR-23**| **P1** | Activity log of last 200 items: state, provider, amount, reference, masked TrxID with 10s reveal, Retry now. | `ActivityLogScreen.kt` |
+| **FR-24**| **P1** | Local alerts: queue stuck over 10 min, token revoked, permissions lost, low storage (<200MB), clock skew (>5 min), SIM change, sudden rise in no-ref SMS. | `PayGateForwarderService.showLocalAlertNotification()` |
+| **FR-25**| **P1** | Consent-gated backfill: allowlisted senders only, last 24h (max 72), `READ_SMS` requested only then, items tagged `source="backfill"`. | `BackfillManager.kt`, `AppPreferences` |
+| **FR-26**| **P1** | Detect clock skew, SIM changes, and low storage; report them in heartbeat. | `HeartbeatRequest.clockSkewMs`, `freeStorageMb`, `simState` |
+| **FR-27**| **P1** | Remote commands through heartbeat response: `revoke`, `flush`, `update_allowlist`, `force_update`, `maintenance`. | `PayGateForwarderService.sendHeartbeatInternal()` |
+| **FR-28**| **P2** | Signed in-app update check; diagnostics export with zero PII. | `SettingsScreen.kt`, Diagnostics JSON export |
+| **FR-29**| **P1** | English and Bengali (বাংলা) localization with instant switching. | `values/strings.xml`, `values-bn/strings.xml` |
+
+---
+
+## 4. SMS Formats & Test Fixtures
+
+| Case | SMS Body | Expected Outcome |
+|---|---|---|
+| **bKash with reference** | `You have received Tk 1,200.00 from 01712750278. Fee Tk 0.00. Balance Tk 1,200.00. TrxID DJC9SZQV0J and Ref REF934P923 at 12/10/2026 15:24` | Forward; `ref_hint = "REF934P923"` |
+| **Long label, lowercase** | `... and reference ref934p923 at ...` | Forward; `ref_hint = "REF934P923"` |
+| **Reference before TrxID**| `... Ref REF934P923 and TrxID DJC9SZQV0J ...` | Forward; `ref_hint = "REF934P923"` |
+| **Hyphenated reference** | `... Ref REF-934P923 ...` | Forward; `ref_hint = "REF934P923"` |
+| **No reference** | `You have received Tk 1,200.00 from 01712750278. Fee Tk 0.00. Balance Tk 1,200.00. TrxID DJC9SZQV0J at 12/10/2026 15:24` | Forward; `ref_hint = null` |
+| **bKash Cash In** | `Cash In Tk 2,500.00 from 01755650768 successful. Fee Tk 0.00. Balance Tk 2,505.39. TrxID DIS133PE5L at 28/09/2026 21:59.` | Forward; `ref_hint = null` |
+| **Nagad received** | `You have received Tk 850.00 from 01811223344. Balance Tk 2,400.00. TrxID 72AB3890 at 12/10/2026` | Forward; `ref_hint = null` |
+| **Rocket received** | `Tk 3,100.00 received from 01999887766. TxnId 98214. Rocket Balance Tk 5,000.00` | Forward; `ref_hint = null` |
+| **OTP mentioning "Ref"** | `Your OTP is 482913. Ref 7781` | Dropped (OTP keyword disqualified) |
+| **Forged sender** | Any wallet text sent from `01712345678` or `+88017...` | Dropped by FR-4 (11-digit phone number) |
+
+---
+
+## 5. API Contracts
+
+Every request carries:
+- `Authorization: Bearer <device_token>`
+- `X-Device-Id: <device_id>`
+- `X-App-Version: 3.0.0`
+- `X-Payload-Version: 3`
+- Over TLS 1.2+
+
+### 5.1 POST `/v1/sms/webhook`
+```json
+{
+  "payload_version": 3,
+  "sender": "bKash",
+  "body": "You have received Tk 1,200.00 from 01712750278. Fee Tk 0.00. Balance Tk 1,200.00. TrxID DJC9SZQV0J and Ref REF934P923 at 12/10/2026 15:24",
+  "client_msg_id": "8f4a13b5c7...64hex",
+  "device_seq": 1042,
+  "received_at": 1760282640,
+  "sim_slot": 1,
+  "ref_hint": "REF934P923",
+  "parser_version": "app-3.0.0",
+  "source": "live",
+  "app_version": "3.0.0"
+}
+```
+
+#### HTTP Response Handling
+| HTTP Code | Meaning | App Action |
+|---|---|---|
+| **200 / 201** | Accepted / Stored / Duplicate | Mark `DELIVERED`, update latency stat |
+| **401 / 403** | Token revoked or merchant hold | Pause queue, keep data, show blocking re-pair screen, local alert |
+| **408, 409, 423, 425, 429, 5xx** | Transient error / Rate limit | Exponential backoff retry; honour `Retry-After` header |
+| **413** | Body too large (> 1 KB) | Mark `FAILED_PERMANENT`, flag for support |
+| **422 / other 4xx**| Server rejected message | Retry 3 times over 1 hour, then mark `FAILED_PERMANENT` with visible "Needs support" badge |
+
+### 5.2 POST `/v1/devices/pair`
+Request:
+```json
+{
+  "pairing_code": "ABCD-1234",
+  "device_name": "Fleet-Phone-01",
+  "model": "Redmi Note 12",
+  "android": "14",
+  "app_version": "3.0.0"
+}
+```
+
+Response (201 Created):
+```json
+{
+  "device_id": "dev_98213",
+  "device_token": "sec_tok_b82a...",
+  "allowed_senders": ["bKash", "NAGAD", "16216"],
+  "heartbeat_seconds": 120,
+  "wallets": [
+    { "slot": 1, "provider": "bkash", "number_masked": "017•••••78" },
+    { "slot": 2, "provider": "nagad", "number_masked": "018•••••99" }
+  ],
+  "server_time": 1760282600
+}
+```
+
+Errors: `400 invalid_code`, `410 code_expired`, `409 code_used`, `429 too_many_attempts`.
+
+### 5.3 POST `/v1/devices/heartbeat`
+Request:
+```json
+{
+  "battery": 88,
+  "charging": true,
+  "network": "wifi",
+  "queue_depth": 0,
+  "stale_count": 0,
+  "failed_count": 0,
+  "perm_sms": true,
+  "perm_notifications": true,
+  "battery_exempt": true,
+  "autostart_confirmed": true,
+  "clock_skew_ms": 120,
+  "free_storage_mb": 8200,
+  "sim_state": [
+    { "slot": 1, "present": true },
+    { "slot": 2, "present": true }
+  ],
+  "ref_seen_count": 42,
+  "no_ref_count": 1,
+  "last_sms_at": 1760282640,
+  "device_seq": 1042,
+  "app_version": "3.0.0"
+}
+```
+
+Response (200 OK):
+```json
+{
+  "status": "ok",
+  "server_time": 1760282760,
+  "allowed_senders": ["bKash", "NAGAD", "16216"],
+  "rotate_token": null,
+  "min_app_version": "3.0.0",
+  "maintenance": false,
+  "commands": ["FLUSH_QUEUE"]
+}
+```
+
+---
+
+## 6. Security and Privacy Architecture
+
+1. **Zero Plaintext Credentials:** Device token stored exclusively in Android KeyStore using hardware-backed `AES/GCM/NoPadding`.
+2. **Encrypted Local Outbox:** Room database storing raw customer SMS is encrypted at rest using SQLCipher.
+3. **No Backup Leakage:** `allowBackup="false"` in manifest, with explicit XML data extraction and backup exclusion rules forbidding cloud or device transfer.
+4. **Zero PII Logging:** `Log.d` and sensitive parameters stripped from release builds; customer phone numbers and transaction values never logged.
+5. **Screen Security:** `FLAG_SECURE` applied on activity log and revealed transaction values to prevent screenshot / recents leakage.
+6. **Network Security:** TLS 1.2+ enforced; cleartext traffic disabled in Android Network Security Config.
+7. **Permission Minimisation:** Only runtime `RECEIVE_SMS` is requested on launch. `READ_SMS` is requested solely during explicit user-consented backfill operations.
+
+---
+
+## 7. Gate UI Design System
+
+Built on Material 3 with fixed Gate UI design tokens:
+- **Background:** `#FAFAF9` (Light) / `#0B0B0E` (Dark)
+- **Surfaces:** `#FFFFFF` / `#F4F4F2` (Surface-2) (Light) · `#141418` / `#1C1C22` (Dark)
+- **Borders:** `#E7E7E3` (Light) / `#2A2A31` (Dark) hairline borders
+- **Accent:** `#5B5BF0` (Light) / `#8B8BFF` (Dark)
+- **Status Indicators:** Success (`#12B76A`), Warning (`#F79009`), Error (`#F04438`)
+- **Typography:** Display 32sp, H1 24sp, H2 20sp, Body 16sp, Caption 12sp; Monospace font for TrxIDs, reference tokens, and hashes.
